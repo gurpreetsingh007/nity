@@ -47,7 +47,7 @@
       position: relative;
     }
     .hidden { display: none; }
-    .button-group { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+    .button-group { display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
     button {
       border: none;
       border-radius: 15px;
@@ -85,9 +85,17 @@
       z-index: 2;
       position: absolute;
     }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
   </style>
 </head>
 <body>
+  <canvas id="confettiCanvas"></canvas>
   <div class="cheerleader cheer-left hidden" id="cheerLeft">📣 HAPPY BIRTHDAY!! 🎉</div>
   <div class="cheerleader cheer-right hidden" id="cheerRight">📣 HAPPY BIRTHDAY!! 🎉</div>
 
@@ -110,19 +118,14 @@
     <div class="button-group">
       <button id="hideBtn">Hide Me</button>
       <button id="colorBtn">Change Color 🌻</button>
-    </div>
-    <div style="margin-top:15px;">
       <button id="sweetMsgBtn">Sweet Message 💌</button>
-      <p id="sweetMsgDisplay" style="margin-top:10px; font-size:1.2rem; color:#ff69b4;"></p>
     </div>
+    <p id="sweetMsgDisplay" style="margin-top:10px; font-size:1.2rem; color:#ff69b4;"></p>
   </div>
 
   <script>
-    // Update time display
     const dateTimeEl = document.getElementById('dateTime');
-    function updateDateTime(){
-      dateTimeEl.textContent = new Date().toLocaleString();
-    }
+    function updateDateTime(){ dateTimeEl.textContent = new Date().toLocaleString(); }
     updateDateTime();
     setInterval(updateDateTime, 1000);
 
@@ -134,96 +137,95 @@
     const cheerRight = document.getElementById('cheerRight');
     const sunflowerLeft = document.getElementById('sunflowerLeft');
     const sunflowerRight = document.getElementById('sunflowerRight');
-
     const sweetMsgBtn = document.getElementById('sweetMsgBtn');
     const sweetMsgDisplay = document.getElementById('sweetMsgDisplay');
-    const sweetMessages = [
-      "You are kind!",
-      "You are beautiful!",
-      "You are amazing!",
-      "You light up the room!",
-      "You are thoughtful!",
-      "You are talented!",
-      "You are inspiring!",
-      "You are brilliant!",
-      "You have a wonderful smile!",
-      "You make a difference!"
-    ];
+    const sweetMessages = ["You are kind!","You are beautiful!","You are amazing!","You light up the room!","You are thoughtful!","You are talented!","You are inspiring!","You are brilliant!","You have a wonderful smile!","You make a difference!"];
 
     let isYellowTheme = false;
 
-    // Simple confetti implementation using HTML5 Canvas
-    function launchConfetti(){
-      const duration = 3 * 1000;
-      const animationEnd = Date.now() + duration;
-      const canvas = document.createElement('canvas');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      canvas.style.position = 'fixed';
-      canvas.style.top = 0;
-      canvas.style.left = 0;
-      canvas.style.pointerEvents = 'none';
-      canvas.style.zIndex = 9999;
-      document.body.appendChild(canvas);
-      const ctx = canvas.getContext('2d');
-      const particles = [];
+    const confettiCanvas = document.getElementById('confettiCanvas');
+    const ctx = confettiCanvas.getContext('2d');
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    const particles = [];
 
+    function createConfetti(){
       for(let i=0;i<300;i++){
-        particles.push({
-          x: Math.random()*canvas.width,
-          y: Math.random()*canvas.height - canvas.height,
-          r: Math.random()*6+2,
-          d: Math.random()*300,
-          color: ['#ff0a54','#ff477e','#ff7096','#ff85a1','#fbb1b1'][Math.floor(Math.random()*5)],
-          tilt: Math.floor(Math.random()*10)-10
-        });
+        particles.push({x: Math.random()*confettiCanvas.width, y: Math.random()*confettiCanvas.height - confettiCanvas.height, r: Math.random()*6+2, d: Math.random()*300, color: ['#ff0a54','#ff477e','#ff7096','#ff85a1','#fbb1b1'][Math.floor(Math.random()*5)], tilt: Math.floor(Math.random()*10)-10});
       }
-
-      function draw(){
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        particles.forEach(p=>{
-          ctx.beginPath();
-          ctx.lineWidth = p.r;
-          ctx.strokeStyle = p.color;
-          ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
-          ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
-          ctx.stroke();
-        });
-      }
-
-      function update(){
-        particles.forEach(p=>{
-          p.y += Math.cos(p.d) + 1 + p.r/2;
-          p.x += Math.sin(p.d);
-          if(p.y > canvas.height){
-            p.y = -10;
-            p.x = Math.random()*canvas.width;
-          }
-        });
-      }
-
-      function animate(){
-        draw();
-        update();
-        if(Date.now() < animationEnd){
-          requestAnimationFrame(animate);
-        } else {
-          document.body.removeChild(canvas);
-        }
-      }
-      animate();
     }
 
-    revealBtn.onclick = () => {
+    function drawConfetti(){
+      ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+      particles.forEach(p=>{
+        ctx.beginPath();
+        ctx.lineWidth = p.r;
+        ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
+        ctx.stroke();
+      });
+    }
+
+    function updateConfetti(){
+      particles.forEach(p=>{
+        p.y += Math.cos(p.d) + 1 + p.r/2;
+        p.x += Math.sin(p.d);
+        if(p.y > confettiCanvas.height){ p.y = -10; p.x = Math.random()*confettiCanvas.width; }
+      });
+    }
+
+    function animateConfetti(){
+      drawConfetti();
+      updateConfetti();
+      requestAnimationFrame(animateConfetti);
+    }
+
+    function launchConfetti(){
+      createConfetti();
+      animateConfetti();
+      setTimeout(()=>{particles.length=0;ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);},3000);
+    }
+
+    revealBtn.addEventListener('click',()=>{
       surprise.classList.remove('hidden');
       cheerLeft.classList.remove('hidden');
       cheerRight.classList.remove('hidden');
-      revealBtn.disabled = true;
-      revealBtn.style.opacity = 0.6;
+      revealBtn.disabled=true;
+      revealBtn.style.opacity=0.6;
       launchConfetti();
-    };
+    });
 
-    hideBtn.onclick = () => {
+    hideBtn.addEventListener('click',()=>{
       surprise.classList.add('hidden');
       cheerLeft.classList.add('hidden');
-      cheerRight.classList
+      cheerRight.classList.add('hidden');
+      sunflowerLeft.classList.add('hidden');
+      sunflowerRight.classList.add('hidden');
+      sweetMsgDisplay.textContent='';
+      revealBtn.disabled=false;
+      revealBtn.style.opacity=1;
+    });
+
+    colorBtn.addEventListener('click',()=>{
+      if(!isYellowTheme){
+        document.body.style.background='linear-gradient(135deg, #fff8dc, #ffeb3b)';
+        document.body.style.color='#d48806';
+        sunflowerLeft.classList.remove('hidden');
+        sunflowerRight.classList.remove('hidden');
+      } else {
+        document.body.style.background='linear-gradient(135deg, #ffe4e1, #fff0f5)';
+        document.body.style.color='#ff69b4';
+        sunflowerLeft.classList.add('hidden');
+        sunflowerRight.classList.add('hidden');
+      }
+      isYellowTheme=!isYellowTheme;
+    });
+
+    sweetMsgBtn.addEventListener('click',()=>{
+      const randomMsg = sweetMessages[Math.floor(Math.random()*sweetMessages.length)];
+      sweetMsgDisplay.textContent=randomMsg;
+    });
+  </script>
+</body>
+</html>
