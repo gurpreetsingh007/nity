@@ -147,9 +147,11 @@
     const ctx = confettiCanvas.getContext('2d');
     confettiCanvas.width = window.innerWidth;
     confettiCanvas.height = window.innerHeight;
-    const particles = [];
+    let particles = [];
+    let confettiAnimation;
 
     function createConfetti(){
+      particles = [];
       for(let i=0;i<300;i++){
         particles.push({x: Math.random()*confettiCanvas.width, y: Math.random()*confettiCanvas.height - confettiCanvas.height, r: Math.random()*6+2, d: Math.random()*300, color: ['#ff0a54','#ff477e','#ff7096','#ff85a1','#fbb1b1'][Math.floor(Math.random()*5)], tilt: Math.floor(Math.random()*10)-10});
       }
@@ -178,13 +180,18 @@
     function animateConfetti(){
       drawConfetti();
       updateConfetti();
-      requestAnimationFrame(animateConfetti);
+      confettiAnimation = requestAnimationFrame(animateConfetti);
     }
 
     function launchConfetti(){
       createConfetti();
       animateConfetti();
-      setTimeout(()=>{particles.length=0;ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);},3000);
+    }
+
+    function stopConfetti(){
+      cancelAnimationFrame(confettiAnimation);
+      ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+      particles = [];
     }
 
     revealBtn.addEventListener('click',()=>{
@@ -205,6 +212,7 @@
       sweetMsgDisplay.textContent='';
       revealBtn.disabled=false;
       revealBtn.style.opacity=1;
+      stopConfetti();
     });
 
     colorBtn.addEventListener('click',()=>{
