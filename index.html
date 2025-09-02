@@ -85,21 +85,9 @@
       z-index: 2;
       position: absolute;
     }
-
-    canvas#confettiCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-    }
   </style>
 </head>
 <body>
-  <canvas id="confettiCanvas"></canvas>
-
   <div class="cheerleader cheer-left hidden" id="cheerLeft">📣 HAPPY BIRTHDAY!! 🎉</div>
   <div class="cheerleader cheer-right hidden" id="cheerRight">📣 HAPPY BIRTHDAY!! 🎉</div>
 
@@ -129,8 +117,8 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
+    // Update time display
     const dateTimeEl = document.getElementById('dateTime');
     function updateDateTime(){
       dateTimeEl.textContent = new Date().toLocaleString();
@@ -164,31 +152,66 @@
 
     let isYellowTheme = false;
 
+    // Simple confetti implementation using HTML5 Canvas
     function launchConfetti(){
       const duration = 3 * 1000;
       const animationEnd = Date.now() + duration;
-      const colors = ['#ff0a54','#ff477e','#ff7096','#ff85a1','#fbb1b1'];
+      const canvas = document.createElement('canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.style.position = 'fixed';
+      canvas.style.top = 0;
+      canvas.style.left = 0;
+      canvas.style.pointerEvents = 'none';
+      canvas.style.zIndex = 9999;
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+      const particles = [];
 
-      (function frame(){
-        confetti({
-          particleCount: 10,
-          angle: 60,
-          spread: 100,
-          origin: { x: 0 },
-          colors: colors
+      for(let i=0;i<300;i++){
+        particles.push({
+          x: Math.random()*canvas.width,
+          y: Math.random()*canvas.height - canvas.height,
+          r: Math.random()*6+2,
+          d: Math.random()*300,
+          color: ['#ff0a54','#ff477e','#ff7096','#ff85a1','#fbb1b1'][Math.floor(Math.random()*5)],
+          tilt: Math.floor(Math.random()*10)-10
         });
-        confetti({
-          particleCount: 10,
-          angle: 120,
-          spread: 100,
-          origin: { x: 1 },
-          colors: colors
-        });
+      }
 
-        if (Date.now() < animationEnd) {
-          requestAnimationFrame(frame);
+      function draw(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach(p=>{
+          ctx.beginPath();
+          ctx.lineWidth = p.r;
+          ctx.strokeStyle = p.color;
+          ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
+          ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
+          ctx.stroke();
+        });
+      }
+
+      function update(){
+        particles.forEach(p=>{
+          p.y += Math.cos(p.d) + 1 + p.r/2;
+          p.x += Math.sin(p.d);
+          if(p.y > canvas.height){
+            p.y = -10;
+            p.x = Math.random()*canvas.width;
+          }
+        });
+      }
+
+      function animate(){
+        draw();
+        update();
+        if(Date.now() < animationEnd){
+          requestAnimationFrame(animate);
+        } else {
+          document.body.removeChild(canvas);
         }
-      }());
+      }
+      animate();
     }
 
     revealBtn.onclick = () => {
@@ -203,33 +226,4 @@
     hideBtn.onclick = () => {
       surprise.classList.add('hidden');
       cheerLeft.classList.add('hidden');
-      cheerRight.classList.add('hidden');
-      sunflowerLeft.classList.add('hidden');
-      sunflowerRight.classList.add('hidden');
-      sweetMsgDisplay.textContent = '';
-      revealBtn.disabled = false;
-      revealBtn.style.opacity = 1;
-    };
-
-    colorBtn.onclick = () => {
-      if (!isYellowTheme) {
-        document.body.style.background = 'linear-gradient(135deg, #fff8dc, #ffeb3b)';
-        document.body.style.color = '#d48806';
-        sunflowerLeft.classList.remove('hidden');
-        sunflowerRight.classList.remove('hidden');
-      } else {
-        document.body.style.background = 'linear-gradient(135deg, #ffe4e1, #fff0f5)';
-        document.body.style.color = '#ff69b4';
-        sunflowerLeft.classList.add('hidden');
-        sunflowerRight.classList.add('hidden');
-      }
-      isYellowTheme = !isYellowTheme;
-    };
-
-    sweetMsgBtn.onclick = () => {
-      const randomIndex = Math.floor(Math.random() * sweetMessages.length);
-      sweetMsgDisplay.textContent = sweetMessages[randomIndex];
-    };
-  </script>
-</body>
-</html>
+      cheerRight.classList
