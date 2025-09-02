@@ -1,96 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Nity Baby</title>
-  </head>
-
-  <body>
-    <marquee
-      direction="right"
-      behavior="alternate"
-      bgcolor="pink"
-      style="border:SOLID"
-    >
-      <h1>TIME IS MY WITNESS AS BELOW</h1>
-      <h2 id="clock"></h2>
-      <h1>I LOVE MY BABY NITY!</h1>
-    </marquee>
-    <div
-      style="text-align:center;
-    background:lightsalmon;
-    padding:10px;"
-    >
-      <button
-        onclick="myFunction()"
-        style="border:none;
-      padding:10px;
-      font-size:20px; border-radius: 15px;
-      width: 200px;
-      background-color: darkgray;
-      color: black;
-      "
-      >
-        Click Me For A Surprise!
-      </button>
-    </div>
-    <div
-      id="myDIV"
-      style="text-align: center;
-    padding: 10px;
-    margin-top: 30px;
-    background-color:goldenrod;
-    border-radius: 25px;
-    font-family: cursive;
-    display: none;
-    font-size: 30px;
-    height: 100px;"
-    >
-      Hidden or Shown: My Love is Always Here, My Sweetest Lovely Lady!
-      <button onclick="myChange()">Change color</button>
-      <button onclick="myFunction2()">Sweet Notes Awaiting :)</button>
-    </div>
-    <div
-    id="myDIV2"
-      style="background: thistle;
-      border-radius: 20px;
-      padding-bottom: 10px;
-      display: none;
-      "
-    >
-      <h2
-        style="background:bisque;
-      text-align:center;
-      font-family:fantasy;
-      padding: 10px;
-      border-radius: 20px;
-      "
-      >
-        Lovely Notes For Lovely Lady Nity!
-      </h2>
-      <ul class="fa-ul">
-        <li>
-          <p >You Are The Sweetest</p>
-        </li>
-        <li>
-          <p>You Are The Kindest</p>
-        </li>
-        <li>
-          <p>You Have The Most Gorgeous Smile</p>
-        </li>
-      </ul>
-      <p><h1 style="padding-left:10px;
-      font-family:monospace"> You Are My Beauteous Beloved Lady</h2></p>
-      <button onclick="myFunction2()">Hide Notes</button>
-    </div>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <title>Happy Birthday Nity 💖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
   <style>
     body {
-      background-image: url("https://cdn.pixabay.com/photo/2022/02/27/19/46/tourist-attraction-7037967_1280.jpg");
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
+      margin: 0;
+      background: linear-gradient(135deg, #ffe4e1, #fff0f5);
+      font-family: 'Dancing Script', cursive;
+      text-align: center;
+      color: #ff69b4;
+      padding: 2rem;
+    }
+    h1.title {
+      font-size: 3rem;
+      margin-top: 1rem;
+      animation: float 3s infinite ease-in-out;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin: 2rem auto;
+      max-width: 500px;
+      font-size: 1.5rem;
+      color: #ff1493;
+      transition: all 0.4s ease;
+    }
+    .hidden {
+      display: none;
+    }
+    button {
+      border: none;
+      border-radius: 15px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1.2rem;
+      background-color: #ff69b4;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #ff1493;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .hearts {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: -1;
+    }
+    .heart {
+      position: absolute;
+      color: rgba(255,105,180,0.7);
+      font-size: 2rem;
+      animation: fall 6s linear infinite;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-10%); }
+      100% { transform: translateY(110%); }
     }
   </style>
-  <script src="script.js"></script>
+</head>
+<body>
+  <h1 class="title">🎉 Happy Birthday, My Sweet Nity! 🎉</h1>
+  <p style="font-size:1.5rem; color:#ff1493;">Time is my witness today — every second is filled with my love for you. 💕</p>
+  <button id="revealBtn">Click For A Sweet Surprise 🎁</button>
+  <div id="surprise" class="card hidden">
+    <p>💖 You are the sweetest, kindest, most gorgeous soul 💖</p>
+    <p>🌸 Every moment with you is a gift I treasure 🌸</p>
+    <p>✨ You are my beauteous beloved lady ✨</p>
+    <button id="hideBtn">Hide Notes</button>
+  </div>
+
+  <div class="hearts" id="hearts"></div>
+
+  <script>
+    const revealBtn = document.getElementById('revealBtn');
+    const hideBtn = document.getElementById('hideBtn');
+    const surprise = document.getElementById('surprise');
+
+    revealBtn.addEventListener('click', () => {
+      surprise.classList.remove('hidden');
+    });
+
+    hideBtn.addEventListener('click', () => {
+      surprise.classList.add('hidden');
+    });
+
+    // Floating hearts
+    const heartsContainer = document.getElementById('hearts');
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.textContent = '❤️';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+      heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+      heartsContainer.appendChild(heart);
+      setTimeout(() => heart.remove(), 6000);
+    }
+    setInterval(createHeart, 500);
+  </script>
+</body>
 </html>
