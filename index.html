@@ -9,14 +9,29 @@
       margin: 0;
       background: linear-gradient(135deg, #ffe4e1, #fff0f5);
       font-family: 'Dancing Script', cursive;
-      text-align: center;
       color: #ff69b4;
       padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+      transition: background 0.5s, color 0.5s;
+    }
+    header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1rem;
+      color: #ff1493;
+      transition: color 0.5s;
     }
     h1.title {
       font-size: 3rem;
       margin-top: 1rem;
       animation: float 3s infinite ease-in-out;
+      text-align: center;
     }
     .card {
       background: white;
@@ -27,11 +42,12 @@
       max-width: 500px;
       font-size: 1.5rem;
       color: #ff1493;
-      transition: all 0.4s ease;
+      transition: all 0.4s ease, background 0.5s, color 0.5s;
+      text-align: center;
+      position: relative;
     }
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none; }
+    .button-group { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
     button {
       border: none;
       border-radius: 15px;
@@ -42,74 +58,137 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-    button:hover {
-      background-color: #ff1493;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    .hearts {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: -1;
-    }
-    .heart {
+    button:hover { background-color: #ff1493; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    .cheerleader {
       position: absolute;
-      color: rgba(255,105,180,0.7);
-      font-size: 2rem;
-      animation: fall 6s linear infinite;
+      bottom: 20px;
+      width: 120px;
+      text-align: center;
+      animation: jump 1s infinite;
+      font-size: 1.2rem;
+      color: #ff1493;
+      font-weight: bold;
     }
-    @keyframes fall {
-      0% { transform: translateY(-10%); }
-      100% { transform: translateY(110%); }
+    .cheer-left { left: 0; }
+    .cheer-right { right: 0; }
+    @keyframes jump { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-20px); } }
+
+    .sunflower {
+      width: 80px;
+      height: 80px;
+      background-image: url('https://cdn.pixabay.com/photo/2014/04/03/11/53/sunflower-311702_1280.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      opacity: 0.8;
+      z-index: 2;
+      position: absolute;
     }
   </style>
 </head>
 <body>
-  <h1 class="title">🎉 Happy Birthday, My Sweet Ashia (Ms. Black Indiana)! 🎉</h1>
-  <p style="font-size:1.5rem; color:#ff1493;">Time is my witness today — every second is filled with my love for you. 💕</p>
+  <div class="cheerleader cheer-left hidden" id="cheerLeft">📣 HAPPY BIRTHDAY!! 🎉</div>
+  <div class="cheerleader cheer-right hidden" id="cheerRight">📣 HAPPY BIRTHDAY!! 🎉</div>
+
+  <header>
+    <div id="dateTime"></div>
+    <div>⏳ Today is a very special day, as time is my witness ✨</div>
+  </header>
+  <h1 class="title">🎉 Happy Birthday, Ashia (Ms. Black Indiana)! 🎉</h1>
+  <p style="font-size:1.5rem; color:#ff1493;">Celebrating a special day for an incredible person. 💕</p>
   <button id="revealBtn">Click For A Sweet Surprise 🎁</button>
+
   <div id="surprise" class="card hidden">
-    <p>💖 You are the sweetest, kindest, most gorgeous soul 💖</p>
-    <p>🌸 Every moment with you is a gift I treasure 🌸</p>
-    <p>✨ You are my beauteous beloved lady, Ms. Black Indiana ✨</p>
-    <button id="hideBtn">Hide Notes</button>
+    <div id="sunflowerLeft" class="sunflower hidden"></div>
+    <div id="sunflowerRight" class="sunflower hidden"></div>
+    <div style="text-align:center;">
+      <p>💖 The sweetest smile that brightens any room 💖</p>
+      <p>🌸 A heart full of kindness and strength 🌸</p>
+      <p>✨ Truly one of a kind — Ms. Black Indiana ✨</p>
+    </div>
+    <div class="button-group">
+      <button id="hideBtn">Hide Me</button>
+      <button id="colorBtn">Change Color 🌻</button>
+    </div>
+    <div style="margin-top:15px;">
+      <button id="sweetMsgBtn">Sweet Message 💌</button>
+      <p id="sweetMsgDisplay" style="margin-top:10px; font-size:1.2rem; color:#ff69b4;"></p>
+    </div>
   </div>
 
-  <div class="hearts" id="hearts"></div>
-
   <script>
+    const dateTimeEl = document.getElementById('dateTime');
+    function updateDateTime(){
+      dateTimeEl.textContent = new Date().toLocaleString();
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
     const revealBtn = document.getElementById('revealBtn');
     const hideBtn = document.getElementById('hideBtn');
     const surprise = document.getElementById('surprise');
+    const colorBtn = document.getElementById('colorBtn');
+    const cheerLeft = document.getElementById('cheerLeft');
+    const cheerRight = document.getElementById('cheerRight');
+    const sunflowerLeft = document.getElementById('sunflowerLeft');
+    const sunflowerRight = document.getElementById('sunflowerRight');
 
-    revealBtn.addEventListener('click', () => {
+    const sweetMsgBtn = document.getElementById('sweetMsgBtn');
+    const sweetMsgDisplay = document.getElementById('sweetMsgDisplay');
+    const sweetMessages = [
+      "You are kind!",
+      "You are beautiful!",
+      "You are amazing!",
+      "You light up the room!",
+      "You are thoughtful!",
+      "You are talented!",
+      "You are inspiring!",
+      "You are brilliant!",
+      "You have a wonderful smile!",
+      "You make a difference!"
+    ];
+
+    let isYellowTheme = false;
+
+    revealBtn.onclick = () => {
       surprise.classList.remove('hidden');
-    });
+      cheerLeft.classList.remove('hidden');
+      cheerRight.classList.remove('hidden');
+      revealBtn.disabled = true;
+      revealBtn.style.opacity = 0.6;
+    };
 
-    hideBtn.addEventListener('click', () => {
+    hideBtn.onclick = () => {
       surprise.classList.add('hidden');
-    });
+      cheerLeft.classList.add('hidden');
+      cheerRight.classList.add('hidden');
+      sunflowerLeft.classList.add('hidden');
+      sunflowerRight.classList.add('hidden');
+      sweetMsgDisplay.textContent = '';
+      revealBtn.disabled = false;
+      revealBtn.style.opacity = 1;
+    };
 
-    // Floating hearts
-    const heartsContainer = document.getElementById('hearts');
-    function createHeart() {
-      const heart = document.createElement('div');
-      heart.classList.add('heart');
-      heart.textContent = '❤️';
-      heart.style.left = Math.random() * 100 + 'vw';
-      heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
-      heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
-      heartsContainer.appendChild(heart);
-      setTimeout(() => heart.remove(), 6000);
-    }
-    setInterval(createHeart, 500);
+    colorBtn.onclick = () => {
+      if (!isYellowTheme) {
+        document.body.style.background = 'linear-gradient(135deg, #fff8dc, #ffeb3b)';
+        document.body.style.color = '#d48806';
+        sunflowerLeft.classList.remove('hidden');
+        sunflowerRight.classList.remove('hidden');
+      } else {
+        document.body.style.background = 'linear-gradient(135deg, #ffe4e1, #fff0f5)';
+        document.body.style.color = '#ff69b4';
+        sunflowerLeft.classList.add('hidden');
+        sunflowerRight.classList.add('hidden');
+      }
+      isYellowTheme = !isYellowTheme;
+    };
+
+    sweetMsgBtn.onclick = () => {
+      const randomIndex = Math.floor(Math.random() * sweetMessages.length);
+      sweetMsgDisplay.textContent = sweetMessages[randomIndex];
+    };
   </script>
 </body>
 </html>
